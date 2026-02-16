@@ -1,0 +1,264 @@
+* ============================================================================
+* Diamond Mine Shimmer Circuit — SPICE Netlist
+* ============================================================================
+* Solar-charged, dusk-activated LED shimmer using CD4093 Schmitt-trigger NAND
+* gates, NPN steady driver, and PNP twinkle drivers.
+*
+* Simulator compatibility: ngspice, LTspice, HSPICE
+* To run:  ngspice diamond-mine-shimmer.cir
+*          (or open in LTspice)
+*
+* Node naming convention:
+*   vdd, gnd          — power rails
+*   sense             — LDR / dusk detector node
+*   dark              — Gate 1 output (enable signal)
+*   fade              — RC ramp node (Q1 base drive)
+*   rc1, rc2          — oscillator RC timing nodes
+*   osc1, osc2        — oscillator outputs (Gate 2, Gate 3)
+*   q1_col            — Q1 collector (steady LED bank)
+*   q2_col, q3_col    — Q2/Q3 collectors (twinkle LED banks)
+* ============================================================================
+
+.title Diamond Mine Shimmer Circuit
+
+* ============================================================================
+* SIMULATION PARAMETERS
+* ============================================================================
+.param Vbat_nom = 3.6
+.param Vbat_init = 3.6
+.param Vsolar_oc = 5.5
+.param Rsolar_int = 25
+.param R_ldr = 1e6
+
+* ============================================================================
+* SECTION A: POWER AND CHARGING
+* ============================================================================
+
+* Battery: 3x AA NiMH in series (modeled as voltage source + ESR)
+Vbat vdd gnd DC {Vbat_init}
+
+* Solar panel (voltage source + internal resistance)
+* For transient simulation, can replace with PWL source for day/night cycle
+Vsolar solar_p gnd DC {Vsolar_oc}
+Rsolar solar_p solar_bus {Rsolar_int}
+
+* Charge current limiting resistor (10 ohm, 1/2W)
+Rcharge solar_bus diode_a 10
+
+* 1N5819 Schottky blocking diode
+D1 diode_a vdd D1N5819
+
+* Bypass capacitor (0.1uF ceramic, close to IC)
+Cbypass vdd gnd 0.1u IC={Vbat_init}
+
+* ============================================================================
+* SECTION B: DUSK DETECTOR (Gate 1)
+* ============================================================================
+
+* LDR: VDD to SENSE node
+* In darkness: R_ldr ~ 1M (SENSE low → DARK goes HIGH)
+* In bright light: R_ldr ~ 5k (SENSE high → DARK stays LOW)
+Rldr vdd sense {R_ldr}
+
+* Pull-down network: 470k + (100k_trimpot || 47k) to GND
+* Trimpot modeled at midpoint (50k)
+R_div1 sense threshold 470k
+R_trim threshold gnd 50k
+R_div2 threshold gnd 47k
+
+* Gate 1: Schmitt NAND with inputs tied (inverter mode)
+* Both inputs connected to SENSE node
+XG1 sense sense dark vdd gnd CD4093_GATE
+
+* ============================================================================
+* SECTION C: FADE-IN RAMP
+* ============================================================================
+
+* DARK → 470k → FADE node → 100uF → GND
+* tau = 470k * 100uF = 47 seconds
+Rfade dark fade 470k
+Cfade fade gnd 100u IC=0
+
+* Q1 base drive: FADE → 10k → Q1 base
+Rb1 fade q1b 10k
+
+* ============================================================================
+* SECTION D: OSCILLATOR 1 — Gate 2 (Gated)
+* ============================================================================
+
+* Pin 5 (InA) = DARK (gating input)
+* Pin 6 (InB) = RC1 node (oscillator feedback)
+* Pin 4 (Out) = OSC1
+XG2 dark rc1 osc1 vdd gnd CD4093_GATE
+
+* Feedback path: output → 1M + trimpot → RC node
+Rosc1 osc1 osc1_mid 1Meg
+Rtrim1 osc1_mid rc1 50k
+
+* Timing capacitor: RC node → 0.47uF → GND
+Cosc1 rc1 gnd 0.47u IC=0
+
+* ============================================================================
+* SECTION E: OSCILLATOR 2 — Gate 3 (Gated)
+* ============================================================================
+
+* Pin 8 (InA) = DARK (gating input)
+* Pin 9 (InB) = RC2 node (oscillator feedback)
+* Pin 10 (Out) = OSC2
+XG3 dark rc2 osc2 vdd gnd CD4093_GATE
+
+* Feedback path: output → 1M + trimpot → RC node
+* Trimpot set to different value than Osc 1 for beat frequency
+Rosc2 osc2 osc2_mid 1Meg
+Rtrim2 osc2_mid rc2 80k
+
+* Timing capacitor: RC node → 0.47uF → GND
+Cosc2 rc2 gnd 0.47u IC=0
+
+* ============================================================================
+* SECTION F: UNUSED GATE 4
+* ============================================================================
+
+* Inputs tied to VDD (output unused, drives into open)
+XG4 vdd vdd g4_nc vdd gnd CD4093_GATE
+Rg4_dummy g4_nc gnd 10Meg
+
+* ============================================================================
+* SECTION G: LED DRIVERS
+* ============================================================================
+
+* --- Q1: Steady Bank Driver (NPN 2N3904, low-side) ---
+* FADE → 10k → base, emitter → GND, collector → LED cathodes
+Q1 q1_col q1b gnd Q2N3904
+
+* Steady LEDs: VDD → 1.5k → LED → Q1 collector
+Rs1 vdd s1a 1.5k
+Ds1 s1a q1_col DLED
+Rs2 vdd s2a 1.5k
+Ds2 s2a q1_col DLED
+Rs3 vdd s3a 1.5k
+Ds3 s3a q1_col DLED
+
+* --- Q2: Twinkle Bank 1 Driver (PNP 2N3906, high-side) ---
+* OSC1 → 220k → base, emitter → VDD, collector → LED anodes
+Rb2 osc1 q2b 220k
+Q2 q2_col q2b vdd Q2N3906
+
+* Twinkle 1 LEDs: Q2 collector → LED → 2.2k → GND
+Dt1 q2_col t1k DLED
+Rt1 t1k gnd 2.2k
+Dt2 q2_col t2k DLED
+Rt2 t2k gnd 2.2k
+Dt3 q2_col t3k DLED
+Rt3 t3k gnd 2.2k
+
+* --- Q3: Twinkle Bank 2 Driver (PNP 2N3906, high-side) ---
+* OSC2 → 220k → base, emitter → VDD, collector → LED anodes
+Rb3 osc2 q3b 220k
+Q3 q3_col q3b vdd Q2N3906
+
+* Twinkle 2 LEDs: Q3 collector → LED → 2.2k → GND
+Dt4 q3_col t4k DLED
+Rt4 t4k gnd 2.2k
+Dt5 q3_col t5k DLED
+Rt5 t5k gnd 2.2k
+Dt6 q3_col t6k DLED
+Rt6 t6k gnd 2.2k
+
+* ============================================================================
+* SUBCIRCUIT: CD4093 Schmitt-Trigger NAND Gate (Behavioral)
+* ============================================================================
+* Inputs: inA, inB
+* Output: out
+* Power: vdd, vss
+*
+* Behavior:
+*   NAND: output LOW only when both inputs above upper threshold
+*   Schmitt hysteresis via positive feedback from output
+*   VT+ ~ 0.66*VDD, VT- ~ 0.33*VDD
+*
+* Modeled using resistive voltage dividers with output feedback to
+* create hysteresis, and a behavioral voltage source for the NAND logic.
+* ============================================================================
+
+.subckt CD4093_GATE inA inB out vdd vss
+
+* High input impedance (CMOS)
+RinA inA vss 1e12
+RinB inB vss 1e12
+
+* Schmitt thresholds via positive feedback
+* Internal nodes a_int and b_int track inputs with hysteresis
+RfwdA inA a_int 100k
+RfbA out a_int 300k
+CfA a_int vss 10p
+
+RfwdB inB b_int 100k
+RfbB out b_int 300k
+CfB b_int vss 10p
+
+* NAND logic: output LOW when both a_int and b_int are above VDD/2
+* B-source: behavioral voltage
+Bnand out_int vss V={IF(V(a_int,vss) > V(vdd,vss)*0.5 & V(b_int,vss) > V(vdd,vss)*0.5, V(vss), V(vdd,vss))}
+
+* Output buffer with finite rise/fall (~100ns for CD4093 at 3.6V)
+Rout out_int out 100
+Cout out vss 100p
+
+.ends CD4093_GATE
+
+* ============================================================================
+* DEVICE MODELS
+* ============================================================================
+
+* 1N5819 Schottky Diode
+.model D1N5819 D(Is=31.7e-9 Rs=0.051 N=1.1 BV=40 IBV=1e-3
++ Cjo=110p M=0.35 VJ=0.6 TT=5.04e-9)
+
+* Red/Amber LED (Vf ~ 1.8-2.0V at low current)
+.model DLED D(Is=1e-20 Rs=5 N=2.0 BV=5 IBV=1e-6 Cjo=10p)
+
+* 2N3904 NPN Transistor
+.model Q2N3904 NPN(Is=6.734f Xti=3 Eg=1.11 Vaf=74.03 Bf=416.4
++ Ne=1.259 Ise=6.734f Ikf=66.78m Xtb=1.5 Br=0.7389 Nc=2
++ Isc=0 Ikr=0 Rc=1 Cjc=3.638p Mjc=0.3085 Vjc=0.75
++ Fc=0.5 Cje=4.493p Mje=0.2593 Vje=0.75 Tr=239.5n
++ Tf=301.2p Itf=0.4 Vtf=4 Xtf=2 Rb=10)
+
+* 2N3906 PNP Transistor
+.model Q2N3906 PNP(Is=1.41f Xti=3 Eg=1.11 Vaf=18.7 Bf=180.7
++ Ne=1.5 Ise=0 Ikf=80m Xtb=1.5 Br=4.977 Nc=2
++ Isc=0 Ikr=0 Rc=2.5 Cjc=9.728p Mjc=0.5776 Vjc=0.75
++ Fc=0.5 Cje=8.063p Mje=0.3677 Vje=0.75 Tr=33.42n
++ Tf=179.3p Itf=0.4 Vtf=4 Xtf=6 Rb=10)
+
+* ============================================================================
+* SIMULATION COMMANDS
+* ============================================================================
+
+* --- Operating Point (DC bias) ---
+* Uncomment to check quiescent conditions:
+* .op
+
+* --- Transient: Dusk activation (120 seconds) ---
+* Shows fade-in ramp and oscillator startup
+* LDR is set to dark (1M) so DARK = HIGH from the start
+.tran 10m 120s 0 10m UIC
+
+* --- DC Sweep: Dusk threshold ---
+* Uncomment to characterize the dusk detector trip point:
+* .dc Rldr 1k 2Meg 10k
+
+* --- Measurements ---
+.meas tran I_steady_avg AVG I(Rs1) FROM=60s TO=120s
+.meas tran I_twinkle1_avg AVG I(Rt1) FROM=60s TO=120s
+.meas tran I_twinkle2_avg AVG I(Rt4) FROM=60s TO=120s
+.meas tran V_fade_60s FIND V(fade) AT=60s
+.meas tran V_dark_ss FIND V(dark) AT=1s
+
+* --- Probe nodes ---
+.save V(dark) V(fade) V(osc1) V(osc2) V(sense)
+.save V(q1_col) V(q2_col) V(q3_col)
+.save I(Vbat)
+
+.end

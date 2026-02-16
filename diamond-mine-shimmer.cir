@@ -1,0 +1,116 @@
+* Diamond Mine Shimmer Circuit
+* Canonical SPICE netlist (analog-focused, CD4093 approximated behaviorally)
+* File aliases: .cir / .sp / .spice
+
+.title Diamond Mine Shimmer Circuit
+
+* =========================
+* Parameters
+* =========================
+.param VDD=3.6
+.param RLDR=1Meg
+.param RPOT=500k
+
+* =========================
+* Power
+* =========================
+V1 vdd 0 {VDD}
+Cdec vdd 0 100n
+
+* Optional solar charging path (commented for bench simulation)
+*Vsolar solar_p 0 4.2
+*D1 solar_p vdd D1N5819
+
+* =========================
+* Dusk detector (Gate 1, CD4093 inverter)
+* =========================
+Rldr vdd sense {RLDR}
+Rpot sense 0 {RPOT}
+XG1 sense dark vdd 0 CD4093_INV
+
+* =========================
+* Fade network
+* =========================
+Rfade dark fade 470k
+Cfade fade 0 100u IC=0
+
+* =========================
+* Oscillator 1 (Gate 2, pins 4+5 tied)
+* =========================
+Rosc1 tw1 n1 1Meg
+Rtrim1 n1 n1c 100k
+Cosc1 n1c 0 470n IC=0
+XG2 n1c tw1 vdd 0 CD4093_INV
+
+* =========================
+* Oscillator 2 (Gate 3, pins 9+10 tied)
+* =========================
+Rosc2 tw2 n2 1Meg
+Rtrim2 n2 n2c 100k
+Cosc2 n2c 0 470n IC=0
+XG3 n2c tw2 vdd 0 CD4093_INV
+
+* =========================
+* LED transistor drivers (all NPN low-side)
+* =========================
+Rb1 fade q1b 47k
+Q1 q1c q1b 0 Q2N3904
+
+Rb2 tw1 q2b 47k
+Q2 q2c q2b 0 Q2N3904
+Dclamp1 q2b dark D1N4148
+
+Rb3 tw2 q3b 47k
+Q3 q3c q3b 0 Q2N3904
+Dclamp2 q3b dark D1N4148
+
+* =========================
+* LED banks (example: 3 LEDs per bank)
+* =========================
+Rs1 vdd ls1a 1.5k
+Ds1 ls1a q1c DLEDW
+Rs2 vdd ls2a 1.5k
+Ds2 ls2a q1c DLEDW
+Rs3 vdd ls3a 1.5k
+Ds3 ls3a q1c DLEDW
+
+Rt11 vdd lt11a 2.2k
+Dt11 lt11a q2c DLEDW
+Rt12 vdd lt12a 2.2k
+Dt12 lt12a q2c DLEDW
+Rt13 vdd lt13a 2.2k
+Dt13 lt13a q2c DLEDW
+
+Rt21 vdd lt21a 2.2k
+Dt21 lt21a q3c DLEDW
+Rt22 vdd lt22a 2.2k
+Dt22 lt22a q3c DLEDW
+Rt23 vdd lt23a 2.2k
+Dt23 lt23a q3c DLEDW
+
+* =========================
+* Behavioral CD4093 inverter model
+* =========================
+* Hysteresis is approximated with a smooth threshold around 0.5*VDD.
+.subckt CD4093_INV in out vdd vss
+Rin in vss 1e12
+Bout out vss V={ V(vdd,vss) * (1 - 0.5*(1+tanh((V(in,vss)-0.5*V(vdd,vss))/0.03))) }
+Rout out vss 1Meg
+.ends CD4093_INV
+
+* =========================
+* Device models
+* =========================
+.model Q2N3904 NPN(Is=6.734f Xti=3 Eg=1.11 Vaf=74.03 Bf=255 Ise=6.734f Ikf=66.78m
++ Xtb=1.5 Br=6.09 Nc=2 Rc=1 Cjc=4.5p Mjc=0.33 Vjc=0.75 Cje=10p Mje=0.33 Vje=0.75
++ Tf=400p Tr=50n)
+.model D1N5819 D(Is=31.7n Rs=0.051 N=1.1 Cjo=110p M=0.35 Vj=0.6 Bv=40 Ibv=1m)
+.model D1N4148 D(Is=2.52n Rs=0.568 N=1.906 Cjo=4p M=0.4 Vj=0.75 Bv=100 Ibv=0.1u)
+.model DLEDW D(Is=1e-20 N=2.0 Rs=8 Cjo=15p)
+
+* =========================
+* Analysis commands
+* =========================
+.tran 20m 180s
+.save V(dark) V(fade) V(tw1) V(tw2) V(sense) V(q1c) V(q2c) V(q3c)
+.end

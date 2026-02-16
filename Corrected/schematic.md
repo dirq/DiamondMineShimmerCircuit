@@ -1,4 +1,4 @@
-# Corrected Wiring Schematic — Diamond Mine Shimmer
+# Wiring Schematic — Diamond Mine Shimmer
 
 ## CD4093 Pin Assignment
 
@@ -30,11 +30,13 @@ graph TD
 ## Section A: Power and Charging
 
 ```
-    Solar+ ──────┤>├──────── Battery+ (VDD)
-               1N5819
-    Solar- ────────────────── Battery- (GND)
+    Solar+ ── R_charge (10Ω) ──┤>├──────── Battery+ (VDD)
+                              1N5819
+    Solar- ──────────────────────────────── Battery- (GND)
 
     Battery: 3x AA NiMH in series = 3.6V nominal
+    Solar panels: 5.5V, 80–100 mA each, wired in parallel
+    R_charge limits trickle current to safe NiMH range (85–220 mA)
 
     Bypass cap (close to IC pins):
     VDD (pin 14) ───┤├─── GND (pin 7)
@@ -43,10 +45,10 @@ graph TD
 
 ```mermaid
 graph LR
-    S1["Solar Panel 1"] --> P["Parallel Junction"]
-    S2["Solar Panel 2"] --> P
-    S3["Solar Panel 3"] --> P
-    P -->|"Solar+"| D["1N5819<br/>Schottky"]
+    S1["Solar Panel 1<br/>5.5V"] --> P["Parallel Junction"]
+    S2["Solar Panel 2<br/>5.5V"] --> P
+    P -->|"Solar+"| RC["R_charge<br/>10 ohm 1/2W"]
+    RC --> D["1N5819<br/>Schottky"]
     D -->|"VDD"| B["+<br/>3x AA NiMH<br/>3.6V<br/>-"]
     B -->|"GND"| GND["System Ground"]
     D -->|"VDD"| C["0.1uF<br/>bypass"]
@@ -90,9 +92,6 @@ graph TD
     style DARK fill:#ffcc00,color:#000
 ```
 
-**Sensitivity adjustment:** Turn trimpot to set the light threshold where LEDs activate.
-Higher total pull-down resistance = triggers at less darkness.
-
 ---
 
 ## Section C: Fade-In Ramp
@@ -113,22 +112,11 @@ Higher total pull-down resistance = triggers at less darkness.
 graph LR
     DARK["Pin 3<br/>DARK"] -->|"470k"| FADE["FADE node"]
     FADE -->|"100uF"| GND["GND"]
-    FADE -->|"10k"| Q1B["Q1 Base<br/>(Steady Bank)"]
+    FADE -->|"10k"| Q1B["Q1 Base<br/>(NPN Steady Bank)"]
 
     style DARK fill:#ffcc00,color:#000
     style FADE fill:#ff9944,color:#000
 ```
-
-**Fade-in timing:**
-
-| Time after DARK goes HIGH | FADE voltage | LED state |
-|---------------------------|-------------|-----------|
-| 0 seconds | 0V | Off |
-| 10 seconds | 0.7V | Barely glowing |
-| 15 seconds | 1.0V | Dim glow |
-| 25 seconds | 1.5V | Moderate brightness |
-| 40 seconds | 2.0V | Near full brightness |
-| 90+ seconds | ~3.5V | Full brightness |
 
 ---
 
@@ -143,8 +131,10 @@ graph LR
                                                │
                                               GND
 
-    DARK=LOW  → Output stuck HIGH, no oscillation, zero current
+    DARK=LOW  → Output stuck HIGH, no oscillation
+               PNP transistor OFF → zero LED current
     DARK=HIGH → Oscillates at ~2.4–2.6 Hz (adjustable via trimpot)
+               PNP transistor toggles → LEDs shimmer
 ```
 
 ---
@@ -203,41 +193,55 @@ graph TD
     Pin 11 (Gate4 Out)      no connection
 ```
 
-**Why this matters:** Floating CMOS inputs draw ~1 mA and risk latch-up. Always tie unused
+Floating CMOS inputs draw excess current and risk latch-up. Always tie unused
 inputs to a rail.
 
 ---
 
 ## Section G: LED Drivers
 
-### Steady Bank (Q1) — base glow, fade-controlled
+### Steady Bank — Q1 (NPN 2N3904, low-side switch, fade-controlled)
 
 ```
-    FADE node ── 10k ──── Q1 Base (2N3904)
+    FADE node ── 10k ──── Q1 Base (2N3904 NPN)
                           Q1 Emitter ── GND
                           Q1 Collector ──┬── LED1 cathode ── LED1 anode ── 1.5k ── VDD
                                          ├── LED2 cathode ── LED2 anode ── 1.5k ── VDD
                                          └── LED3 cathode ── LED3 anode ── 1.5k ── VDD
 ```
 
-### Twinkle Bank 1 (Q2) — shimmer layer 1
+Day: FADE = 0V → Q1 OFF → LEDs dark
+Night: FADE ramps 0V → 3.6V over 47s → Q1 gradually turns on → LEDs bloom
+
+### Twinkle Bank 1 — Q2 (PNP 2N3906, high-side switch)
 
 ```
-    Pin 4 (OSC1) ── 220k ── Q2 Base (2N3904)
-                             Q2 Emitter ── GND
-                             Q2 Collector ──┬── LED ── 2.2k ── VDD
-                                            ├── LED ── 2.2k ── VDD
-                                            └── LED ── 2.2k ── VDD
+                          VDD
+                           │
+                       Q2 Emitter (2N3906 PNP)
+                           │
+    Pin 4 (OSC1) ── 220k ── Q2 Base
+                           │
+                       Q2 Collector ──┬── LED anode ── LED cathode ── 2.2k ── GND
+                                      ├── LED anode ── LED cathode ── 2.2k ── GND
+                                      └── LED anode ── LED cathode ── 2.2k ── GND
 ```
 
-### Twinkle Bank 2 (Q3) — shimmer layer 2
+Day: Pin 4 = HIGH (stuck) → Q2 base ≈ VDD → Veb ≈ 0 → Q2 OFF → LEDs dark
+Night: Pin 4 oscillates → Q2 toggles → LEDs shimmer
+
+### Twinkle Bank 2 — Q3 (PNP 2N3906, high-side switch)
 
 ```
-    Pin 10 (OSC2) ── 220k ── Q3 Base (2N3904)
-                              Q3 Emitter ── GND
-                              Q3 Collector ──┬── LED ── 2.2k ── VDD
-                                             ├── LED ── 2.2k ── VDD
-                                             └── LED ── 2.2k ── VDD
+                          VDD
+                           │
+                       Q3 Emitter (2N3906 PNP)
+                           │
+    Pin 10 (OSC2) ── 220k ── Q3 Base
+                           │
+                       Q3 Collector ──┬── LED anode ── LED cathode ── 2.2k ── GND
+                                      ├── LED anode ── LED cathode ── 2.2k ── GND
+                                      └── LED anode ── LED cathode ── 2.2k ── GND
 ```
 
 ```mermaid
@@ -248,25 +252,27 @@ graph TD
     VDD -->|"1.5k"| SL2["LED"] --> Q1C
     VDD -->|"1.5k"| SL3["LED"] --> Q1C
     FADE["FADE node"] -->|"10k"| Q1B["Q1 Base"]
-    Q1B --> Q1["Q1<br/>2N3904"]
+    Q1B --> Q1["Q1 NPN<br/>2N3904"]
     Q1C --> Q1
     Q1 --> GND1["GND"]
 
-    VDD -->|"2.2k"| TL1["LED"] --> Q2C["Q2 Collector"]
-    VDD -->|"2.2k"| TL2["LED"] --> Q2C
-    VDD -->|"2.2k"| TL3["LED"] --> Q2C
+    VDD --> Q2E["Q2 Emitter"]
+    Q2E --> Q2["Q2 PNP<br/>2N3906"]
     OSC1["Pin 4<br/>OSC1"] -->|"220k"| Q2B["Q2 Base"]
-    Q2B --> Q2["Q2<br/>2N3904"]
-    Q2C --> Q2
-    Q2 --> GND2["GND"]
+    Q2B --> Q2
+    Q2 --> Q2C["Q2 Collector"]
+    Q2C --> TL1["LED"] -->|"2.2k"| GND2["GND"]
+    Q2C --> TL2["LED"] -->|"2.2k"| GND2
+    Q2C --> TL3["LED"] -->|"2.2k"| GND2
 
-    VDD -->|"2.2k"| TL4["LED"] --> Q3C["Q3 Collector"]
-    VDD -->|"2.2k"| TL5["LED"] --> Q3C
-    VDD -->|"2.2k"| TL6["LED"] --> Q3C
+    VDD --> Q3E["Q3 Emitter"]
+    Q3E --> Q3["Q3 PNP<br/>2N3906"]
     OSC2["Pin 10<br/>OSC2"] -->|"220k"| Q3B["Q3 Base"]
-    Q3B --> Q3["Q3<br/>2N3904"]
-    Q3C --> Q3
-    Q3 --> GND3["GND"]
+    Q3B --> Q3
+    Q3 --> Q3C["Q3 Collector"]
+    Q3C --> TL4["LED"] -->|"2.2k"| GND3["GND"]
+    Q3C --> TL5["LED"] -->|"2.2k"| GND3
+    Q3C --> TL6["LED"] -->|"2.2k"| GND3
 
     style FADE fill:#ff9944,color:#000
     style OSC1 fill:#44cc44,color:#000
@@ -279,15 +285,18 @@ graph TD
 
 | Net Name | Connections |
 |----------|------------|
-| **VDD** | Battery+, Pin 14, Pin 12, Pin 13, LDR leg 1, LED anode resistors, 0.1uF cap |
-| **GND** | Battery-, Pin 7, R_sense bottom, 100uF(-), 0.47uF(x2), Q1/Q2/Q3 emitters, 0.1uF cap |
-| **SENSE** | LDR leg 2, Pin 1, Pin 2, R_sense top |
-| **DARK** | Pin 3, Pin 5, Pin 8, 470k (to FADE) |
-| **FADE** | 470k/100uF junction, 10k (to Q1 base) |
-| **RC1** | 1M+trim/0.47uF junction, Pin 6 |
-| **RC2** | 1M+trim/0.47uF junction, Pin 9 |
-| **OSC1** | Pin 4, 1M (to RC1), 220k (to Q2 base) |
-| **OSC2** | Pin 10, 1M (to RC2), 220k (to Q3 base) |
-| **Q1_COL** | Q1 collector, Steady LED cathodes |
-| **Q2_COL** | Q2 collector, Twinkle 1 LED cathodes |
-| **Q3_COL** | Q3 collector, Twinkle 2 LED cathodes |
+| **VDD** | Battery+, R_charge output, Pin 14, Pin 12, Pin 13, LDR leg 1, Steady LED anode resistors, Q2 emitter, Q3 emitter, 0.1uF cap |
+| **GND** | Battery-, Pin 7, Trimpot/47k ground ends, 100uF(-), 0.47uF(x2), Q1 emitter, Twinkle LED cathode resistors, 0.1uF cap |
+| **SOLAR+** | Solar panel positive bus, R_charge input |
+| **CHARGE** | R_charge output, 1N5819 anode |
+| **SENSE** | LDR leg 2, Pin 1, Pin 2, 470k top |
+| **THRESH** | 470k bottom, 100k trimpot wiper/end1, 47k top |
+| **DARK** | Pin 3, Pin 5, Pin 8, 470k fade top |
+| **FADE** | 470k fade bottom, 100uF(+), 10k top |
+| **RC1** | 1M+trim/0.47uF junction (osc 1), Pin 6 |
+| **RC2** | 1M+trim/0.47uF junction (osc 2), Pin 9 |
+| **OSC1** | Pin 4, 1M top (to RC1), 220k (to Q2 base) |
+| **OSC2** | Pin 10, 1M top (to RC2), 220k (to Q3 base) |
+| **Q1_COL** | Q1 collector, Steady LED cathodes (3x) |
+| **Q2_COL** | Q2 collector, Twinkle 1 LED anodes (3x) |
+| **Q3_COL** | Q3 collector, Twinkle 2 LED anodes (3x) |

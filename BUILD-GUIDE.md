@@ -144,15 +144,13 @@ Pin 4+5 ─┤                     Pin 6 (2Y) ──── TW1 signal
         GND
 ```
 
-4. **Enable gating**: connect the DARK signal (pin 3) through a 100 kΩ resistor to the oscillator input node. This ensures the oscillator only runs when DARK is HIGH.
-
-> Alternative enable method: use the DARK signal to pull the oscillator input low via a diode or transistor when DARK is LOW.
+4. Do **not** inject DARK directly into the oscillator RC node; that biases the waveform and can create incorrect daytime behavior.
 
 ### Step 11 — Oscillator 2 (Gate 3)
 
 1. Repeat the same topology using Gate 3 (pins 9, 10 → 8).
 2. Use a second 1 MΩ resistor, second 100 kΩ trim pot, and second 0.47 µF cap.
-3. Enable from the DARK signal the same way.
+3. Keep this oscillator identical to Gate 2 (independent RC values only).
 
 ### Step 12 — Test Oscillators
 
@@ -178,12 +176,20 @@ Pin 4+5 ─┤                     Pin 6 (2Y) ──── TW1 signal
 1. Connect a 47 kΩ base resistor from TW1 (pin 6) to Q2's **base**.
 2. Emitter → GND.
 3. Collector → twinkle LED bank 1.
+4. Add a 1N4148 clamp diode from Q2 base to DARK:
+   - **Anode** to Q2 base
+   - **Cathode** to DARK (pin 3)
+   This keeps Q2 off when DARK is LOW.
 
 ### Step 15 — Q3 (Twinkle Driver 2)
 
 1. Connect a 47 kΩ base resistor from TW2 (pin 8) to Q3's **base**.
 2. Emitter → GND.
 3. Collector → twinkle LED bank 2.
+4. Add a second 1N4148 clamp diode from Q3 base to DARK:
+   - **Anode** to Q3 base
+   - **Cathode** to DARK (pin 3)
+   This keeps Q3 off when DARK is LOW.
 
 ---
 

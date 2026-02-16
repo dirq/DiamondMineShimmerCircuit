@@ -10,14 +10,15 @@
 |-----|------|----------------|-----------|-------|
 | 3 | AA NiMH rechargeable cells | 1.2 V / 2000 mAh typ. | BAT1–3 | Eneloop or similar low-self-discharge preferred |
 | 1 | 3×AA battery holder | — | — | With leads or snap connector |
-| 2–3 | Small indoor solar panels | 2 V / 50–100 mA each | SOL1–3 | Wire in **parallel** (same voltage, additive current) |
+| 2–3 | Small indoor solar panels | 2 V / 20–40 mA each | SOL1–3 | Wire in **parallel** (same voltage, additive current); keep total \(I_{SC}\) at or below ~80 mA for 2000 mAh cells |
 | 1 | 1N5819 Schottky diode | 40 V / 1 A | D1 | Prevents battery discharging back through panels at night |
 
 ### Charging Notes
 
-- Parallel panels yield ~100–300 mA peak under bright indoor light (window sill).
-- The Schottky diode drops only ~0.2 V vs ~0.6 V for a standard 1N4001 — important at 3.6 V rail.
-- NiMH cells tolerate indefinite trickle charge at C/20 or below. At 2000 mAh that is ≤100 mA, well within range for 2–3 small panels.
+- Typical indoor current is usually much lower than panel nameplate current; expect roughly 5–40 mA depending on light and panel orientation.
+- The Schottky diode drops only ~0.2 V vs ~0.6 V for a standard 1N4001 — important at a 3.6 V rail.
+- For long-term safe trickle charging of 2000 mAh NiMH cells, keep sustained charge current at or below ~C/25 to C/20 (about 80–100 mA max).
+- If you expect strong sunlight exposure, reduce panel count or add charge-current limiting.
 
 ---
 
@@ -94,6 +95,7 @@ Adjust each channel's trim pot so the two rates are **slightly different** (e.g.
 |-----|------|-------|-----------|-------|
 | 2–3 | NPN transistor | 2N3904 | Q1, Q2, Q3 | Or BC547, 2N2222 — any small-signal NPN |
 | 3 | Base resistor | 10 kΩ–220 kΩ | R_b1–R_b3 | Limits base current; 47 kΩ is a good starting point |
+| 2 | Signal diode | 1N4148 | D_t1, D_t2 | Twinkle base clamp to guarantee OFF during daylight |
 
 ### Transistor Selection Notes
 
@@ -144,7 +146,7 @@ These are intentionally low currents — the "diamond mine" aesthetic calls for 
 | Transistors | 3 |
 | LEDs | 10–20 |
 | ICs | 1 |
-| Diodes | 1 |
+| Diodes | 3 |
 | Potentiometers | 3 |
 | Solar panels | 2–3 |
 | Battery cells | 3 |

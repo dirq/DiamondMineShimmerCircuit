@@ -1,0 +1,48 @@
+Reference,Quantity,Value,Package,Description,Category,Notes
+U1,1,CD4093BE,DIP-14,Quad Schmitt-trigger NAND gate,IC,TI or ON Semi
+Q1,1,2N3904,TO-92,NPN general-purpose transistor,Transistor,Steady bank driver (low-side)
+Q2,1,2N3906,TO-92,PNP general-purpose transistor,Transistor,Twinkle bank 1 driver (high-side)
+Q3,1,2N3906,TO-92,PNP general-purpose transistor,Transistor,Twinkle bank 2 driver (high-side)
+D1,1,1N5819,DO-41,Schottky diode 40V 1A,Diode,Solar charge blocking Vf~0.3V
+LDR1,1,GL5528,5mm,Light-dependent resistor,Sensor,~5k bright / ~500k dark
+C_bypass,1,0.1uF,Ceramic 104,Bypass decoupling capacitor,Capacitor,Close to IC VDD/GND
+C1,1,0.47uF,Film 474,Oscillator 1 timing cap,Capacitor,Film preferred for stability
+C2,1,0.47uF,Film 474,Oscillator 2 timing cap,Capacitor,Film preferred for stability
+C_fade,1,100uF 10V+,Electrolytic,Fade-in ramp capacitor,Capacitor,Observe polarity
+R_charge,1,10 ohm,Axial 1/2W,Solar charge current limiter,Resistor,1/2W minimum rating
+R_div1,1,470k,Axial 1/4W 5%,Dusk threshold fixed portion,Resistor,
+R_div2,1,47k,Axial 1/4W 5%,Dusk threshold parallel pulldown,Resistor,
+R_fade,1,470k,Axial 1/4W 5%,Fade-in ramp charging resistor,Resistor,tau = 470k x 100uF = 47s
+R_osc1,1,1M,Axial 1/4W 5%,Oscillator 1 timing fixed,Resistor,
+R_osc2,1,1M,Axial 1/4W 5%,Oscillator 2 timing fixed,Resistor,
+R_b2,1,220k,Axial 1/4W 5%,OSC1 to Q2 PNP base drive,Resistor,
+R_b3,1,220k,Axial 1/4W 5%,OSC2 to Q3 PNP base drive,Resistor,
+R_b1,1,10k,Axial 1/4W 5%,FADE to Q1 NPN base drive,Resistor,
+R_Ls1,1,1.5k,Axial 1/4W 5%,Steady bank LED 1 current limit,Resistor,~0.93 mA
+R_Ls2,1,1.5k,Axial 1/4W 5%,Steady bank LED 2 current limit,Resistor,~0.93 mA
+R_Ls3,1,1.5k,Axial 1/4W 5%,Steady bank LED 3 current limit,Resistor,~0.93 mA
+R_Lt1,1,2.2k,Axial 1/4W 5%,Twinkle 1 LED 1 current limit,Resistor,~0.64 mA
+R_Lt2,1,2.2k,Axial 1/4W 5%,Twinkle 1 LED 2 current limit,Resistor,~0.64 mA
+R_Lt3,1,2.2k,Axial 1/4W 5%,Twinkle 1 LED 3 current limit,Resistor,~0.64 mA
+R_Lt4,1,2.2k,Axial 1/4W 5%,Twinkle 2 LED 1 current limit,Resistor,~0.64 mA
+R_Lt5,1,2.2k,Axial 1/4W 5%,Twinkle 2 LED 2 current limit,Resistor,~0.64 mA
+R_Lt6,1,2.2k,Axial 1/4W 5%,Twinkle 2 LED 3 current limit,Resistor,~0.64 mA
+RV1,1,100k,3-pin trimmer,Dusk sensitivity trimpot,Potentiometer,Cermet or carbon
+RV2,1,100k,3-pin trimmer,Twinkle speed 1 trimpot,Potentiometer,Cermet or carbon
+RV3,1,100k,3-pin trimmer,Twinkle speed 2 trimpot,Potentiometer,Cermet or carbon
+D_Ls1,1,LED Red/Amber,3mm or 5mm,Steady bank LED 1,LED,Vf ~1.8-2.1V
+D_Ls2,1,LED Red/Amber,3mm or 5mm,Steady bank LED 2,LED,Vf ~1.8-2.1V
+D_Ls3,1,LED Red/Amber,3mm or 5mm,Steady bank LED 3,LED,Vf ~1.8-2.1V
+D_Lt1,1,LED Red/Amber,3mm or 5mm,Twinkle 1 LED 1,LED,Vf ~1.8-2.1V
+D_Lt2,1,LED Red/Amber,3mm or 5mm,Twinkle 1 LED 2,LED,Vf ~1.8-2.1V
+D_Lt3,1,LED Red/Amber,3mm or 5mm,Twinkle 1 LED 3,LED,Vf ~1.8-2.1V
+D_Lt4,1,LED Red/Amber,3mm or 5mm,Twinkle 2 LED 1,LED,Vf ~1.8-2.1V
+D_Lt5,1,LED Red/Amber,3mm or 5mm,Twinkle 2 LED 2,LED,Vf ~1.8-2.1V
+D_Lt6,1,LED Red/Amber,3mm or 5mm,Twinkle 2 LED 3,LED,Vf ~1.8-2.1V
+BAT1-3,3,AA NiMH,AA cell,Rechargeable battery,Power,1.2V 2000mAh Eneloop recommended
+BH1,1,3xAA holder,,Battery holder with leads,Mechanical,
+SOL1,1,Solar panel 5.5V,,5-6V 80-100mA indoor panel,Power,Wire in parallel
+SOL2,1,Solar panel 5.5V,,5-6V 80-100mA indoor panel,Power,Wire in parallel
+BB1,1,830-point breadboard,,Solderless prototyping board,Mechanical,
+JW1,1,Jumper wire kit,,22 AWG solid core assorted,Mechanical,
+SK1,1,DIP-14 socket,,IC socket (optional),Mechanical,Protects IC during soldering

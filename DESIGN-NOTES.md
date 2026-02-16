@@ -26,7 +26,7 @@ Solar Panels (parallel) ──►|── 3×AA NiMH (3.6 V nominal)
 
 **Why Schottky?** At night, the solar panels become a low-impedance path to ground. Without D1, the battery would discharge backward through the panels. A standard silicon diode (1N4001) drops ~0.6 V — at 3.6 V that is a 17% loss. The 1N5819 Schottky drops only ~0.2 V, leaving more voltage for the circuit.
 
-**Why NiMH?** NiMH cells are tolerant of continuous trickle charging (unlike Li-ion, which requires a charge controller). At C/20 rates typical of small indoor panels, they charge safely and indefinitely.
+**Why NiMH?** NiMH cells are tolerant of continuous trickle charging (unlike Li-ion, which requires a charge controller). Keep sustained charge current conservative (about C/25 to C/20 for long life), and size panel current accordingly.
 
 **Why 3 cells?** Three NiMH cells give 3.6 V nominal (3.0 V discharged → 4.2 V freshly charged). This keeps the CD4093 comfortably in its 3–15 V operating range and provides enough headroom above the LED forward voltage (~2.8 V for warm white).
 
@@ -212,6 +212,8 @@ I_LED = (VDD - V_LED - V_CE(sat)) / R_LED
       = (3.6 - 2.8 - 0.2) / 2200
       ≈ 0.27 mA per LED
 ```
+
+**Daylight lockout:** each twinkle base includes a clamp diode to DARK (`anode=base`, `cathode=DARK`). In daylight (`DARK=LOW`), any oscillator-high base drive is shunted away so the twinkle transistors remain off.
 
 ---
 

@@ -1,28 +1,34 @@
-# Solar-Powered Dual Oscillator "Diamond Mine" LED System
+# Diamond Mine Shimmer Circuit — Final Design
 
-## Corrected Design — February 2026
-
-A solar-charged, dusk-activated LED shimmer circuit using only analog CMOS logic and
-transistors. No microcontroller. Extremely low power. Suitable for indoor solar use.
+A solar-charged, dusk-activated LED shimmer circuit. No microcontroller, no firmware —
+pure analog CMOS logic and transistor drivers produce an organic, non-repeating sparkle
+field that charges by day and shimmers by night.
 
 ## Documents
 
 | File | Contents |
 |------|----------|
-| [circuit-evaluation.md](circuit-evaluation.md) | Full accuracy review with issues and fixes |
-| [schematic.md](schematic.md) | Corrected wiring schematic with all gate assignments |
-| [breadboard-layout.md](breadboard-layout.md) | Clean physical layout with wire color guide |
-| [bill-of-materials.md](bill-of-materials.md) | Complete parts list with values and notes |
+| [schematic.md](schematic.md) | Complete wiring schematic with gate assignments and net list |
+| [bill-of-materials.md](bill-of-materials.md) | Full parts list with values, calculations, and cost |
+| [breadboard-layout.md](breadboard-layout.md) | Physical layout with zone map and wire color guide |
+| [circuit-evaluation.md](circuit-evaluation.md) | Performance characteristics and power budget |
+| [circuit-evaluation-deep-dive.md](circuit-evaluation-deep-dive.md) | Extended design review with longevity analysis |
+| [design-documentation.md](design-documentation.md) | Theory of operation, timing math, tuning guide |
+| [bom.csv](bom.csv) | Machine-readable BOM for ordering |
+| [diamond-mine-shimmer.cir](diamond-mine-shimmer.cir) | SPICE netlist for circuit simulation |
+| [diamond-mine-shimmer.v](diamond-mine-shimmer.v) | Verilog behavioral model |
+| [diamond-mine-shimmer.kicad_sch](diamond-mine-shimmer.kicad_sch) | KiCad schematic for PCB workflow |
 
 ## System Overview
 
 ```mermaid
 graph TD
     subgraph Power
-        SOLAR["Solar Panels<br/>(parallel)"]
+        SOLAR["Solar Panels<br/>5.5V, parallel"]
         D1["1N5819<br/>Schottky Diode"]
-        BAT["3x AA NiMH<br/>3.6V"]
-        SOLAR -->|"charge"| D1 --> BAT
+        RC["R_charge<br/>10 ohm"]
+        BAT["3x AA NiMH<br/>3.6V nominal"]
+        SOLAR -->|"charge"| D1 --> RC --> BAT
     end
 
     subgraph "CD4093 — Single IC, 4 Gates"
@@ -38,9 +44,9 @@ graph TD
     end
 
     subgraph "LED Outputs"
-        Q1["Q1 — Steady Bank<br/>3x LED @ 1.5k"]
-        Q2["Q2 — Twinkle Bank 1<br/>3x LED @ 2.2k"]
-        Q3["Q3 — Twinkle Bank 2<br/>3x LED @ 2.2k"]
+        Q1["Q1 (NPN 2N3904)<br/>Steady Bank<br/>3x LED @ 1.5k"]
+        Q2["Q2 (PNP 2N3906)<br/>Twinkle Bank 1<br/>3x LED @ 2.2k"]
+        Q3["Q3 (PNP 2N3906)<br/>Twinkle Bank 2<br/>3x LED @ 2.2k"]
     end
 
     BAT -->|"VDD"| G1
@@ -70,17 +76,18 @@ sequenceDiagram
     LDR->>G1: SENSE voltage falls below VT-
     G1->>G1: Schmitt hysteresis prevents flicker
     G1->>Fade: DARK goes HIGH
-    G1->>Osc: DARK enables Gate 2 & Gate 3
+    G1->>Osc: DARK enables Gate 2 and Gate 3
     Fade->>LEDs: Steady bank glows (10s to start, 40s full)
     Osc->>LEDs: Twinkle banks shimmer at ~2.4–2.6 Hz
     Note over LEDs: Beat frequency ~0.2 Hz creates<br/>drifting 5-second visual pattern
 ```
 
-## Design Achievements
+## Design Highlights
 
-- Solar self-sufficiency (indoor panels)
-- Smooth dusk activation with Schmitt hysteresis
-- Gentle 40-second fade-in bloom
-- Multi-layer organic shimmer from dual oscillator beats
-- ~10 mA active draw / <5 uA standby
-- No microcontroller, no regulator, no firmware
+- **Solar self-sufficiency** — 5.5V panels with current-limited trickle charge
+- **Smooth dusk activation** — Schmitt hysteresis prevents twilight flicker
+- **Gentle 40-second fade-in** — RC ramp creates organic bloom
+- **Multi-layer shimmer** — dual oscillator beats produce non-repeating patterns
+- **Correct day/night gating** — PNP high-side switches ensure zero LED current in daylight
+- **~5 mA active / ~7 uA standby** — months of battery life, easily solar-sustained
+- **No microcontroller, no regulator, no firmware**

@@ -1,4 +1,4 @@
-# Breadboard Layout — Diamond Mine Shimmer (Corrected)
+# Breadboard Layout — Diamond Mine Shimmer
 
 ## Board Overview
 
@@ -9,10 +9,10 @@ components grouped by function zone.
 graph TD
     subgraph "Breadboard Zones (left to right)"
         direction LR
-        ZA["Zone A<br/>POWER INPUT<br/>Solar, Diode,<br/>Battery<br/>(rows 1–5)"]
+        ZA["Zone A<br/>POWER INPUT<br/>Solar, R_charge,<br/>Diode, Battery<br/>(rows 1–5)"]
         ZB["Zone B<br/>DUSK DETECTOR<br/>LDR, R_sense,<br/>Trimpot<br/>(rows 6–14)"]
         ZC["Zone C<br/>IC + OSCILLATORS<br/>CD4093, RC networks,<br/>Fade cap<br/>(rows 15–35)"]
-        ZD["Zone D<br/>TRANSISTORS<br/>Q1, Q2, Q3<br/>(rows 38–52)"]
+        ZD["Zone D<br/>TRANSISTORS<br/>Q1 (NPN), Q2/Q3 (PNP)<br/>(rows 38–52)"]
         ZE["Zone E<br/>LED BANKS<br/>Resistors + LEDs<br/>(rows 55–63)"]
         ZA --> ZB --> ZC --> ZD --> ZE
     end
@@ -39,12 +39,16 @@ Place a **0.1uF ceramic cap** spanning (+) and (−) rails near the IC location 
 ## Zone A: Power Input (rows 1–5)
 
 ```
-Row 1:  Solar+ wire → 1N5819 anode (band faces right)
+Row 1:  Solar+ wire → 10 ohm R_charge (1/2W) → Row 2
+Row 2:  R_charge output → 1N5819 anode (band faces right toward row 3)
 Row 3:  1N5819 cathode → jumper wire to (+) rail
 Row 1:  Solar− wire → jumper to (−) rail
         Battery+ → (+) rail
         Battery− → (−) rail
 ```
+
+> **R_charge (10 ohm, 1/2W):** Limits solar charge current to safe NiMH trickle
+> range. Must be rated 1/2W minimum (0.48W worst-case dissipation).
 
 ---
 
@@ -136,9 +140,9 @@ Row 35 (RC2 node):
 
 ## Zone D: Transistors (rows 38–52)
 
-All transistors are 2N3904 NPN. Flat side facing you, pins left-to-right: E, B, C.
+All transistors: flat side facing you, pins left-to-right: E, B, C.
 
-### Q1 — Steady Bank Driver
+### Q1 — Steady Bank Driver (NPN 2N3904)
 
 ```
 Row 40:  col A = Emitter → (−) rail
@@ -146,29 +150,33 @@ Row 40:  col A = Emitter → (−) rail
          col C = Collector → jumper to Steady LED bank
 ```
 
-### Q2 — Twinkle Bank 1 Driver
+### Q2 — Twinkle Bank 1 Driver (PNP 2N3906)
 
 ```
-Row 45:  col A = Emitter → (−) rail
+Row 45:  col A = Emitter → (+) rail       ← NOTE: VDD, not GND
          col B = Base    ← 220k ← Pin 4 / OSC1 (Row 18 col A)
          col C = Collector → jumper to Twinkle LED bank 1
 ```
 
-### Q3 — Twinkle Bank 2 Driver
+### Q3 — Twinkle Bank 2 Driver (PNP 2N3906)
 
 ```
-Row 50:  col A = Emitter → (−) rail
+Row 50:  col A = Emitter → (+) rail       ← NOTE: VDD, not GND
          col B = Base    ← 220k ← Pin 10 / OSC2 (Row 19 col J)
          col C = Collector → jumper to Twinkle LED bank 2
 ```
+
+> **PNP wiring:** Q2 and Q3 emitters connect to (+) VDD rail, NOT (−) GND.
+> This is the opposite of Q1 (NPN). The PNP high-side topology ensures the
+> twinkle LEDs are completely OFF when DARK = LOW (daytime).
 
 ---
 
 ## Zone E: LED Banks (rows 55–63)
 
-Each LED: anode → resistor → (+) rail, cathode → transistor collector.
+### Steady Bank (NPN Q1: VDD → resistor → LED → Q1 collector)
 
-### Steady Bank (1.5k per LED, cathodes → Q1 collector at Row 40 col C)
+Each LED: anode via resistor to (+) rail, cathode to Q1 collector.
 
 ```
 Row 55:  1.5k from (+) rail → LED anode, LED cathode → wire to Row 40 col D
@@ -176,21 +184,29 @@ Row 56:  1.5k from (+) rail → LED anode, LED cathode → wire to Row 40 col D
 Row 57:  1.5k from (+) rail → LED anode, LED cathode → wire to Row 40 col D
 ```
 
-### Twinkle Bank 1 (2.2k per LED, cathodes → Q2 collector at Row 45 col C)
+### Twinkle Bank 1 (PNP Q2: Q2 collector → LED → resistor → GND)
+
+Each LED: anode from Q2 collector, cathode via resistor to (−) rail.
 
 ```
-Row 58:  2.2k from (+) rail → LED anode, LED cathode → wire to Row 45 col D
-Row 59:  2.2k from (+) rail → LED anode, LED cathode → wire to Row 45 col D
-Row 60:  2.2k from (+) rail → LED anode, LED cathode → wire to Row 45 col D
+Row 58:  wire from Row 45 col D → LED anode, LED cathode → 2.2k → (−) rail
+Row 59:  wire from Row 45 col D → LED anode, LED cathode → 2.2k → (−) rail
+Row 60:  wire from Row 45 col D → LED anode, LED cathode → 2.2k → (−) rail
 ```
 
-### Twinkle Bank 2 (2.2k per LED, cathodes → Q3 collector at Row 50 col C)
+### Twinkle Bank 2 (PNP Q3: Q3 collector → LED → resistor → GND)
+
+Each LED: anode from Q3 collector, cathode via resistor to (−) rail.
 
 ```
-Row 61:  2.2k from (+) rail → LED anode, LED cathode → wire to Row 50 col D
-Row 62:  2.2k from (+) rail → LED anode, LED cathode → wire to Row 50 col D
-Row 63:  2.2k from (+) rail → LED anode, LED cathode → wire to Row 50 col D
+Row 61:  wire from Row 50 col D → LED anode, LED cathode → 2.2k → (−) rail
+Row 62:  wire from Row 50 col D → LED anode, LED cathode → 2.2k → (−) rail
+Row 63:  wire from Row 50 col D → LED anode, LED cathode → 2.2k → (−) rail
 ```
+
+> **Topology difference:** Steady bank LEDs connect VDD-side resistor → LED → Q1
+> collector. Twinkle bank LEDs connect Q2/Q3 collector → LED → GND-side resistor.
+> This reversal is required for the PNP high-side switch topology.
 
 ---
 
@@ -214,13 +230,13 @@ graph LR
 
 | Color | Signal | From → To |
 |-------|--------|-----------|
-| Red | VDD | (+) rail → Pin 14, Pin 12, Pin 13, LDR, LED resistors |
-| Black | GND | (−) rail → Pin 7, all emitters, caps, R_sense |
+| Red | VDD | (+) rail → Pin 14, Pin 12, Pin 13, LDR, Steady LED resistors, Q2/Q3 emitters |
+| Black | GND | (−) rail → Pin 7, Q1 emitter, caps, trimpot ends, Twinkle LED resistors |
 | Yellow | DARK | Pin 3 → Pin 5, Pin 8, 470k fade resistor |
 | Orange | FADE | 470k/100uF junction → 10k → Q1 base |
 | Green | OSC1 | Pin 4 → 1M (feedback) and 220k → Q2 base |
 | Blue | OSC2 | Pin 10 → 1M (feedback) and 220k → Q3 base |
-| White | SENSE | LDR → Pin 1, Pin 2, R_sense |
+| White | SENSE | LDR → Pin 1, Pin 2, 470k divider top |
 
 ---
 
@@ -229,6 +245,7 @@ graph LR
 1. **Keep bypass cap close to IC** — The 0.1uF ceramic should be within 1–2 rows of pins 7 and 14.
 2. **Electrolytic polarity** — The 100uF fade cap has a stripe marking the negative leg. Negative to (−) rail.
 3. **Trimpot orientation** — Mount trimpots with adjustment screw facing outward for easy tuning.
-4. **LED polarity** — Longer leg = anode (goes toward resistor/VDD). Flat edge on lens = cathode (goes toward transistor).
-5. **Transistor orientation** — 2N3904 flat side facing you: E (left), B (center), C (right). Verify with datasheet for your specific package.
+4. **LED polarity** — Longer leg = anode. Flat edge on lens = cathode.
+5. **NPN (Q1) vs PNP (Q2, Q3)** — Q1 emitter to GND. Q2/Q3 emitters to VDD. All three: flat side facing you, E-B-C left to right.
 6. **Film vs electrolytic** — Use film caps (0.47uF) for oscillators (non-polarized). Use electrolytic (100uF) only for the fade ramp (polarized, observe +/−).
+7. **R_charge heat** — The 10 ohm resistor may get warm in full sun. Use 1/2W rating and leave airspace around it.

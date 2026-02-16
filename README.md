@@ -32,6 +32,21 @@ At sunset, an LDR-based dusk detector enables the system and feeds a slow fade-i
 
 ---
 
+## Exported Engineering Files
+
+| File | Format | Purpose |
+|---|---|---|
+| [diamond-mine-shimmer.cir](diamond-mine-shimmer.cir) | SPICE netlist | Analog simulation baseline |
+| [diamond-mine-shimmer.sp](diamond-mine-shimmer.sp) | SPICE netlist | Alternate extension for simulators |
+| [diamond-mine-shimmer.spice](diamond-mine-shimmer.spice) | SPICE netlist | Alternate extension for simulators |
+| [diamond-mine-shimmer.v](diamond-mine-shimmer.v) | Verilog | Behavioral digital timing model |
+| [diamond-mine-shimmer.vhd](diamond-mine-shimmer.vhd) | VHDL | Behavioral digital timing model |
+| [BOM.csv](BOM.csv) | CSV | Machine-readable bill of materials |
+| [diamond-mine-shimmer.kicad_pcb](diamond-mine-shimmer.kicad_pcb) | KiCad PCB | PCB layout container/template |
+| [design-documentation.md](design-documentation.md) | Markdown | Text export of design documentation |
+
+---
+
 ## System Architecture
 
 ```
