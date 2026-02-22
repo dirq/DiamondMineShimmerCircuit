@@ -6,6 +6,8 @@ field that charges by day and shimmers by night.
 
 ## Documents
 
+![Breadboard zone overview](assets/diamond-mine-breadboard-overview.png)
+
 | File | Contents |
 |------|----------|
 | [BUILD-GUIDE.md](BUILD-GUIDE.md) | Step-by-step breadboard assembly and testing |

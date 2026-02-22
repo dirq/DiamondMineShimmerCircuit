@@ -4,6 +4,23 @@ Step-by-step assembly and testing for the corrected circuit on a solderless
 breadboard. Follow in order — each phase includes a verification step so you
 catch wiring errors before they compound.
 
+## Breadboard Assembly Diagrams
+
+Quick-reference PNG diagrams — print or keep on a second screen while building.
+
+![Breadboard zone overview](assets/diamond-mine-breadboard-overview.png)
+
+| Diagram | File | Use When |
+|---------|------|----------|
+| **Breadboard zones** | `diamond-mine-breadboard-overview.png` | Planning layout — where each section goes |
+| **CD4093 pinout** | `diamond-mine-cd4093-pinout.png` | Placing IC and wiring pins 1–14 |
+| **Transistor orientation** | `diamond-mine-transistor-orientation.png` | Q1/Q2/Q3 — flat side, E–B–C, PNP vs NPN |
+| **LED wiring** | `diamond-mine-led-wiring.png` | Steady vs Twinkle banks — polarity and topology |
+| **Power section** | `diamond-mine-power-section.png` | Solar, R_charge, diode, battery polarity |
+| **Dusk & oscillators** | `diamond-mine-dusk-and-oscillators.png` | LDR divider, RC networks, capacitor polarity |
+
+---
+
 **Required references during assembly:**
 - [breadboard-layout.md](breadboard-layout.md) — physical row/column placement
 - [schematic.md](schematic.md) — electrical connections
@@ -23,6 +40,8 @@ catch wiring errors before they compound.
 ---
 
 ## Phase 1 — Power Rails
+
+![Power section wiring — solar, R_charge, diode, battery](assets/diamond-mine-power-section.png)
 
 ### Step 1: Battery and Rails
 
@@ -53,6 +72,8 @@ catch wiring errors before they compound.
 
 ## Phase 2 — CD4093 IC
 
+![CD4093 pinout — notch orientation, pin numbering, and connections](assets/diamond-mine-cd4093-pinout.png)
+
 ### Step 4: IC Socket / Placement
 
 1. Place the CD4093 (or DIP-14 socket) straddling the center channel at rows 15–21.
@@ -80,6 +101,8 @@ catch wiring errors before they compound.
 ---
 
 ## Phase 3 — Dusk Detector
+
+![Dusk detector, fade ramp, and oscillator RC networks](assets/diamond-mine-dusk-and-oscillators.png)
 
 ### Step 7: LDR and Divider
 
@@ -147,6 +170,8 @@ catch wiring errors before they compound.
 
 ## Phase 6 — Transistor Drivers
 
+![Transistor orientation — E-B-C pin order, NPN vs PNP wiring](assets/diamond-mine-transistor-orientation.png)
+
 ### Step 11: Q1 — Steady Bank (NPN 2N3904)
 
 1. Insert 2N3904 at Row 40 (flat side facing you: E-B-C left to right).
@@ -182,6 +207,8 @@ catch wiring errors before they compound.
 ---
 
 ## Phase 7 — LED Banks
+
+![LED wiring — Steady bank vs Twinkle bank topology and polarity](assets/diamond-mine-led-wiring.png)
 
 ### Step 14: Steady Bank (3 LEDs)
 

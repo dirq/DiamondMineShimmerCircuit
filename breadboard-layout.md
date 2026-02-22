@@ -5,6 +5,8 @@
 Standard 830-point solderless breadboard. Power rails top and bottom, IC centered,
 components grouped by function zone.
 
+![Breadboard zone overview](assets/diamond-mine-breadboard-overview.png)
+
 ```mermaid
 graph TD
     subgraph "Breadboard Zones (left to right)"
@@ -38,6 +40,8 @@ Place a **0.1uF ceramic cap** spanning (+) and (−) rails near the IC location 
 
 ## Zone A: Power Input (rows 1–5)
 
+![Power section — solar panels, R_charge, diode, battery connections](assets/diamond-mine-power-section.png)
+
 ```
 Row 1:  Solar+ wire → 10 ohm R_charge (1/2W) → Row 2
 Row 2:  R_charge output → 1N5819 anode (band faces right toward row 3)
@@ -68,6 +72,10 @@ Row 11:  47k resistor → (−) rail
 ---
 
 ## Zone C: IC + Oscillators (rows 15–35)
+
+![CD4093 pinout and connections](assets/diamond-mine-cd4093-pinout.png)
+
+![Dusk detector, fade ramp, and oscillator RC networks](assets/diamond-mine-dusk-and-oscillators.png)
 
 ### Bypass Capacitor
 
@@ -146,6 +154,8 @@ Row 35 (RC2 node):
 
 ## Zone D: Transistors (rows 38–52)
 
+![Transistor orientation — E-B-C pin order, NPN vs PNP wiring](assets/diamond-mine-transistor-orientation.png)
+
 All transistors: flat side facing you, pins left-to-right: E, B, C.
 
 ### Q1 — Steady Bank Driver (NPN 2N3904)
@@ -179,6 +189,8 @@ Row 50:  col A = Emitter → (+) rail       ← NOTE: VDD, not GND
 ---
 
 ## Zone E: LED Banks (rows 55–63)
+
+![LED wiring — Steady bank vs Twinkle bank topology and polarity](assets/diamond-mine-led-wiring.png)
 
 ### Steady Bank (NPN Q1: VDD → resistor → LED → Q1 collector)
 

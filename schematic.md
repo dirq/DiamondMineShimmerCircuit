@@ -1,5 +1,7 @@
 # Wiring Schematic — Diamond Mine Shimmer
 
+![CD4093 pinout and connections](assets/diamond-mine-cd4093-pinout.png)
+
 ## CD4093 Pin Assignment
 
 ```
@@ -28,6 +30,8 @@ graph TD
 ---
 
 ## Section A: Power and Charging
+
+![Power section — solar, R_charge, diode, battery](assets/diamond-mine-power-section.png)
 
 ```
     Solar+ ── R_charge (10Ω) ──┤>├──────── Battery+ (VDD)
@@ -58,6 +62,8 @@ graph LR
 ---
 
 ## Section B: Dusk Detector (Gate 1)
+
+![Dusk detector, fade ramp, and oscillator RC networks](assets/diamond-mine-dusk-and-oscillators.png)
 
 ```
     VDD ─── LDR ───┬─── Pin 1 (Gate1 InA)
@@ -199,6 +205,10 @@ inputs to a rail.
 ---
 
 ## Section G: LED Drivers
+
+![Transistor orientation — E-B-C pin order, NPN vs PNP](assets/diamond-mine-transistor-orientation.png)
+
+![LED wiring — Steady bank vs Twinkle bank topology](assets/diamond-mine-led-wiring.png)
 
 ### Steady Bank — Q1 (NPN 2N3904, low-side switch, fade-controlled)
 
