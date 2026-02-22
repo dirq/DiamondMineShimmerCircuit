@@ -8,6 +8,7 @@ field that charges by day and shimmers by night.
 
 | File | Contents |
 |------|----------|
+| [BUILD-GUIDE.md](BUILD-GUIDE.md) | Step-by-step breadboard assembly and testing |
 | [schematic.md](schematic.md) | Complete wiring schematic with gate assignments and net list |
 | [bill-of-materials.md](bill-of-materials.md) | Full parts list with values, calculations, and cost |
 | [breadboard-layout.md](breadboard-layout.md) | Physical layout with zone map and wire color guide |
@@ -25,10 +26,10 @@ field that charges by day and shimmers by night.
 graph TD
     subgraph Power
         SOLAR["Solar Panels<br/>5.5V, parallel"]
-        D1["1N5819<br/>Schottky Diode"]
         RC["R_charge<br/>10 ohm"]
+        D1["1N5819<br/>Schottky Diode"]
         BAT["3x AA NiMH<br/>3.6V nominal"]
-        SOLAR -->|"charge"| D1 --> RC --> BAT
+        SOLAR -->|"charge"| RC --> D1 --> BAT
     end
 
     subgraph "CD4093 — Single IC, 4 Gates"

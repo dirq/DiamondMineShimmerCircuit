@@ -69,6 +69,12 @@ Row 11:  47k resistor → (−) rail
 
 ## Zone C: IC + Oscillators (rows 15–35)
 
+### Bypass Capacitor
+
+```
+Row 14:  0.1uF ceramic cap: (+) rail → (−) rail   (within 1 row of Pin 14)
+```
+
 ### CD4093 Placement
 
 IC straddles center channel at rows 15–21:
@@ -102,7 +108,7 @@ Row 21:    Pin 7  ──────────  Pin 8
 |------|----|---------|
 | Row 17 col A | Row 19 col A (Pin 5) | Gate oscillator 1 |
 | Row 17 col A | Row 21 col J (Pin 8) | Gate oscillator 2 |
-| Row 17 col B | Row 23 (470k to FADE) | Start of fade ramp |
+| Row 17 col C | Row 23 (470k to FADE) | Start of fade ramp |
 
 ### Fade-In Ramp
 
@@ -154,7 +160,7 @@ Row 40:  col A = Emitter → (−) rail
 
 ```
 Row 45:  col A = Emitter → (+) rail       ← NOTE: VDD, not GND
-         col B = Base    ← 220k ← Pin 4 / OSC1 (Row 18 col A)
+         col B = Base    ← 100k ← Pin 4 / OSC1 (Row 18 col A)
          col C = Collector → jumper to Twinkle LED bank 1
 ```
 
@@ -162,7 +168,7 @@ Row 45:  col A = Emitter → (+) rail       ← NOTE: VDD, not GND
 
 ```
 Row 50:  col A = Emitter → (+) rail       ← NOTE: VDD, not GND
-         col B = Base    ← 220k ← Pin 10 / OSC2 (Row 19 col J)
+         col B = Base    ← 100k ← Pin 10 / OSC2 (Row 19 col J)
          col C = Collector → jumper to Twinkle LED bank 2
 ```
 
@@ -216,7 +222,7 @@ Row 63:  wire from Row 50 col D → LED anode, LED cathode → 2.2k → (−) ra
 graph LR
     RED["RED<br/>VDD power"] ~~~ BLACK["BLACK<br/>GND ground"]
     YELLOW["YELLOW<br/>DARK signal<br/>(Pin 3 → Pin 5, Pin 8, 470k)"] ~~~ ORANGE["ORANGE<br/>FADE node<br/>(100uF → 10k → Q1)"]
-    GREEN["GREEN<br/>OSC1 output<br/>(Pin 4 → 220k → Q2)"] ~~~ BLUE["BLUE<br/>OSC2 output<br/>(Pin 10 → 220k → Q3)"]
+    GREEN["GREEN<br/>OSC1 output<br/>(Pin 4 → 100k → Q2)"] ~~~ BLUE["BLUE<br/>OSC2 output<br/>(Pin 10 → 100k → Q3)"]
     WHITE["WHITE<br/>LDR SENSE node<br/>(LDR → Pin 1/2)"]
 
     style RED fill:#cc0000,color:#fff
@@ -234,8 +240,8 @@ graph LR
 | Black | GND | (−) rail → Pin 7, Q1 emitter, caps, trimpot ends, Twinkle LED resistors |
 | Yellow | DARK | Pin 3 → Pin 5, Pin 8, 470k fade resistor |
 | Orange | FADE | 470k/100uF junction → 10k → Q1 base |
-| Green | OSC1 | Pin 4 → 1M (feedback) and 220k → Q2 base |
-| Blue | OSC2 | Pin 10 → 1M (feedback) and 220k → Q3 base |
+| Green | OSC1 | Pin 4 → 1M (feedback) and 100k → Q2 base |
+| Blue | OSC2 | Pin 10 → 1M (feedback) and 100k → Q3 base |
 | White | SENSE | LDR → Pin 1, Pin 2, 470k divider top |
 
 ---

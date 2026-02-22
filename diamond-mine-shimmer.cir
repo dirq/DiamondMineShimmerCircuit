@@ -140,8 +140,8 @@ Rs3 vdd s3a 1.5k
 Ds3 s3a q1_col DLED
 
 * --- Q2: Twinkle Bank 1 Driver (PNP 2N3906, high-side) ---
-* OSC1 → 220k → base, emitter → VDD, collector → LED anodes
-Rb2 osc1 q2b 220k
+* OSC1 → 100k → base, emitter → VDD, collector → LED anodes
+Rb2 osc1 q2b 100k
 Q2 q2_col q2b vdd Q2N3906
 
 * Twinkle 1 LEDs: Q2 collector → LED → 2.2k → GND
@@ -153,8 +153,8 @@ Dt3 q2_col t3k DLED
 Rt3 t3k gnd 2.2k
 
 * --- Q3: Twinkle Bank 2 Driver (PNP 2N3906, high-side) ---
-* OSC2 → 220k → base, emitter → VDD, collector → LED anodes
-Rb3 osc2 q3b 220k
+* OSC2 → 100k → base, emitter → VDD, collector → LED anodes
+Rb3 osc2 q3b 100k
 Q3 q3_col q3b vdd Q2N3906
 
 * Twinkle 2 LEDs: Q3 collector → LED → 2.2k → GND

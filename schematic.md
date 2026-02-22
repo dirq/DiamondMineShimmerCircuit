@@ -220,7 +220,7 @@ Night: FADE ramps 0V → 3.6V over 47s → Q1 gradually turns on → LEDs bloom
                            │
                        Q2 Emitter (2N3906 PNP)
                            │
-    Pin 4 (OSC1) ── 220k ── Q2 Base
+    Pin 4 (OSC1) ── 100k ── Q2 Base
                            │
                        Q2 Collector ──┬── LED anode ── LED cathode ── 2.2k ── GND
                                       ├── LED anode ── LED cathode ── 2.2k ── GND
@@ -237,7 +237,7 @@ Night: Pin 4 oscillates → Q2 toggles → LEDs shimmer
                            │
                        Q3 Emitter (2N3906 PNP)
                            │
-    Pin 10 (OSC2) ── 220k ── Q3 Base
+    Pin 10 (OSC2) ── 100k ── Q3 Base
                            │
                        Q3 Collector ──┬── LED anode ── LED cathode ── 2.2k ── GND
                                       ├── LED anode ── LED cathode ── 2.2k ── GND
@@ -258,7 +258,7 @@ graph TD
 
     VDD --> Q2E["Q2 Emitter"]
     Q2E --> Q2["Q2 PNP<br/>2N3906"]
-    OSC1["Pin 4<br/>OSC1"] -->|"220k"| Q2B["Q2 Base"]
+    OSC1["Pin 4<br/>OSC1"] -->|"100k"| Q2B["Q2 Base"]
     Q2B --> Q2
     Q2 --> Q2C["Q2 Collector"]
     Q2C --> TL1["LED"] -->|"2.2k"| GND2["GND"]
@@ -267,7 +267,7 @@ graph TD
 
     VDD --> Q3E["Q3 Emitter"]
     Q3E --> Q3["Q3 PNP<br/>2N3906"]
-    OSC2["Pin 10<br/>OSC2"] -->|"220k"| Q3B["Q3 Base"]
+    OSC2["Pin 10<br/>OSC2"] -->|"100k"| Q3B["Q3 Base"]
     Q3B --> Q3
     Q3 --> Q3C["Q3 Collector"]
     Q3C --> TL4["LED"] -->|"2.2k"| GND3["GND"]
@@ -295,8 +295,8 @@ graph TD
 | **FADE** | 470k fade bottom, 100uF(+), 10k top |
 | **RC1** | 1M+trim/0.47uF junction (osc 1), Pin 6 |
 | **RC2** | 1M+trim/0.47uF junction (osc 2), Pin 9 |
-| **OSC1** | Pin 4, 1M top (to RC1), 220k (to Q2 base) |
-| **OSC2** | Pin 10, 1M top (to RC2), 220k (to Q3 base) |
+| **OSC1** | Pin 4, 1M top (to RC1), 100k (to Q2 base) |
+| **OSC2** | Pin 10, 1M top (to RC2), 100k (to Q3 base) |
 | **Q1_COL** | Q1 collector, Steady LED cathodes (3x) |
 | **Q2_COL** | Q2 collector, Twinkle 1 LED anodes (3x) |
 | **Q3_COL** | Q3 collector, Twinkle 2 LED anodes (3x) |

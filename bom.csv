@@ -15,8 +15,8 @@ R_div2,1,47k,Axial 1/4W 5%,Dusk threshold parallel pulldown,Resistor,
 R_fade,1,470k,Axial 1/4W 5%,Fade-in ramp charging resistor,Resistor,tau = 470k x 100uF = 47s
 R_osc1,1,1M,Axial 1/4W 5%,Oscillator 1 timing fixed,Resistor,
 R_osc2,1,1M,Axial 1/4W 5%,Oscillator 2 timing fixed,Resistor,
-R_b2,1,220k,Axial 1/4W 5%,OSC1 to Q2 PNP base drive,Resistor,
-R_b3,1,220k,Axial 1/4W 5%,OSC2 to Q3 PNP base drive,Resistor,
+R_b2,1,100k,Axial 1/4W 5%,OSC1 to Q2 PNP base drive,Resistor,
+R_b3,1,100k,Axial 1/4W 5%,OSC2 to Q3 PNP base drive,Resistor,
 R_b1,1,10k,Axial 1/4W 5%,FADE to Q1 NPN base drive,Resistor,
 R_Ls1,1,1.5k,Axial 1/4W 5%,Steady bank LED 1 current limit,Resistor,~0.93 mA
 R_Ls2,1,1.5k,Axial 1/4W 5%,Steady bank LED 2 current limit,Resistor,~0.93 mA

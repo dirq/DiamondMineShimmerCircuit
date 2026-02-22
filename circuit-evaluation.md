@@ -50,7 +50,7 @@ pie title Active Current Budget (~5.1 mA average)
     "Twinkle Bank 1 (3 LEDs @ 0.64 mA, 50%)" : 0.96
     "Twinkle Bank 2 (3 LEDs @ 0.64 mA, 50%)" : 0.96
     "Q1 base drive" : 0.29
-    "CD4093 dynamic + base drives" : 0.13
+    "CD4093 dynamic + base drives" : 0.16
 ```
 
 | State | Current | Battery Life (2000 mAh) |
@@ -106,7 +106,7 @@ The circuit is easily solar self-sustaining with even modest indoor light.
 | Steady LEDs (3x) | 0.93 mA each | 2.79 mA |
 | Twinkle 1 LEDs (3x, 50%) | 0.64 mA each × 50% | 0.96 mA |
 | Twinkle 2 LEDs (3x, 50%) | 0.64 mA each × 50% | 0.96 mA |
-| Base drives | Q1: 0.29 mA, Q2/Q3: 0.013 mA each | 0.32 mA |
+| Base drives | Q1: 0.29 mA, Q2/Q3: 0.029 mA each | 0.35 mA |
 | **Total active (average)** | | **~5.1 mA** |
 
 ---

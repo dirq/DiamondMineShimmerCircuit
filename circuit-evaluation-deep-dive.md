@@ -2,11 +2,10 @@
 
 ## Scope
 
-This evaluation examines the **corrected** design for solar self-sufficiency, energy
-storage integrity, day/night transition behavior, and multi-year longevity as a
-permanent art installation. It builds on the original circuit-evaluation.md (which
-identified four critical bugs in the first draft) and finds **two new critical flaws**
-in the corrected design plus several longevity concerns.
+This evaluation is a design-review history of the Diamond Mine Shimmer Circuit. It
+documents two critical flaws found in the original v1 design, the corrections applied,
+and a forward-looking longevity analysis for the final corrected circuit. All critical
+flaws described below have been **resolved** in the current design files.
 
 ---
 
@@ -17,16 +16,18 @@ in the corrected design plus several longevity concerns.
 | Analog shimmer concept | Excellent — dual beat-frequency oscillators are elegant and organic |
 | Dusk detection + fade-in | Solid — Schmitt hysteresis and 47-second RC ramp work well |
 | LED current design | Good — per-LED resistors, red/amber Vf match, low current |
-| Solar charging | **CRITICAL FLAW** — 2V panels cannot charge a 3.6V NiMH pack |
-| Daytime LED gating | **CRITICAL FLAW** — NAND gate stuck-HIGH turns twinkle LEDs ON during the day |
+| Solar charging | **RESOLVED** — upgraded to 5.5V panels with 10-ohm current limiter |
+| Daytime LED gating | **RESOLVED** — PNP high-side switches ensure zero daytime LED current |
 | NiMH longevity | Needs attention — no over-discharge cutoff, no charge regulation |
 | Component lifetime | Good for 5–10 years with battery replacement every 2–3 years |
 
 ---
 
-## Critical Flaw 1: Solar Panels Cannot Charge the Battery
+## Historical Flaw 1: Solar Panels Cannot Charge the Battery (RESOLVED)
 
-### The Problem
+> **Status: FIXED.** The current design uses 5.5V panels with a 10-ohm current-limiting resistor.
+
+### The Original Problem
 
 The BOM specifies **"~2V, 50–100 mA" solar panels wired in parallel**.
 
@@ -117,9 +118,11 @@ recommended — too little headroom.
 
 ---
 
-## Critical Flaw 2: NAND Gating Bug — Twinkle LEDs ON During Daytime
+## Historical Flaw 2: NAND Gating Bug — Twinkle LEDs ON During Daytime (RESOLVED)
 
-### The Problem
+> **Status: FIXED.** The current design uses PNP 2N3906 high-side drivers for Q2/Q3.
+
+### The Original Problem
 
 The corrected design gates the oscillators by feeding DARK to one input of each
 NAND gate. The intent was to disable oscillation (and LED current) during daylight.
@@ -188,7 +191,7 @@ wired as high-side switches:
                         │
                        GND
 
-Pin 4 (OSC1) ── 220k ── Q2 Base
+Pin 4 (OSC1) ── 100k ── Q2 Base
 ```
 
 PNP behavior:
@@ -274,7 +277,7 @@ on standby alone. Daytime draw is negligible.
 | CD4093 + oscillators (dynamic) | ~0.1 mA | Two gates oscillating at ~2.5 Hz |
 | LDR divider (dark: LDR ~1M, pull-down ~500k) | ~2.4 uA | Negligible |
 | Q1 base drive (FADE/10k) | ~0.29 mA | At full FADE voltage |
-| Q2/Q3 base drive (2 x 13 uA) | ~0.03 mA | Through 220k each |
+| Q2/Q3 base drive (2 x 29 uA) | ~0.06 mA | Through 100k each |
 | Steady Bank: 3 LEDs x 0.93 mA | 2.79 mA | Through 1.5k each |
 | Twinkle Bank 1: 3 LEDs x 0.64 mA x 50% duty | 0.96 mA | Square wave, 50% avg |
 | Twinkle Bank 2: 3 LEDs x 0.64 mA x 50% duty | 0.96 mA | Square wave, 50% avg |
@@ -553,7 +556,7 @@ The original BUILD-GUIDE.md has several conflicts with the corrected design:
 |---------------------|----------------------|-------|
 | Step 5: Gate 4 pins 12+13 tied to **GND** | Pins 12+13 tied to **VDD** | Both work, but VDD is conventional (output LOW = lower power) |
 | Step 10: Pins 4+5 tied (inverter mode) | Pin 5 = DARK gating input | Different oscillator topology |
-| Steps 14–15: 47k base resistors | 220k base resistors | 47k gives ~62 uA Ib (original), 220k gives ~13 uA (corrected) |
+| Steps 14–15: 47k base resistors | 100k base resistors | 47k gives ~62 uA Ib (original), 100k gives ~29 uA (corrected) |
 | Step 10: Pin 6 = output (2Y) | Pin 4 = output (2Y) | The corrected schematic matches the actual CD4093 datasheet (TI) |
 | BOM.md: Gate 2 = pins 4,5 → 6 | Corrected: Gate 2 = pins 5,6 → 4 | Original BOM had pin assignments backwards |
 
@@ -562,23 +565,22 @@ match.
 
 ---
 
-## Summary of Required Changes
+## Summary of Changes
 
-### Must Fix (circuit will not work without these)
+### Critical Fixes (applied — circuit now functions correctly)
 
-| # | Issue | Fix | BOM Impact |
-|---|-------|-----|------------|
-| **F1** | Solar panels (2V) cannot charge 3.6V battery | Replace with 5–6V panels; add 10–15 ohm series resistor | Change panel spec, +1 resistor |
-| **F2** | NAND stuck-HIGH turns twinkle LEDs ON during day | Replace Q2, Q3 with 2N3906 PNP high-side switches | Change 2x 2N3904 → 2x 2N3906 |
+| # | Issue | Fix Applied | BOM Impact |
+|---|-------|-------------|------------|
+| **F1** | Solar panels (2V) cannot charge 3.6V battery | Replaced with 5.5V panels; added 10-ohm series resistor | Changed panel spec, +1 resistor |
+| **F2** | NAND stuck-HIGH turns twinkle LEDs ON during day | Replaced Q2, Q3 with 2N3906 PNP high-side switches; base drive set to 100k for reliable saturation | Changed 2x 2N3904 → 2x 2N3906 |
 
-### Should Fix (longevity and reliability)
+### Recommended for Longevity
 
-| # | Issue | Fix | BOM Impact |
-|---|-------|-----|------------|
+| # | Issue | Recommendation | BOM Impact |
+|---|-------|----------------|------------|
 | **S1** | No NiMH over-discharge protection | Accept natural CD4093 cutoff at ~3V, or add voltage supervisor | Optional: +1 IC ($0.50) |
 | **S2** | Breadboard not permanent | Transfer to perfboard after prototyping | Perfboard + solder |
 | **S3** | No power switch | Add SPST toggle on VDD line | +1 switch ($0.50) |
-| **S4** | BUILD-GUIDE.md contradicts corrected schematic | Update BUILD-GUIDE.md | Documentation only |
 
 ### Nice to Have (enhanced experience)
 
@@ -625,7 +627,7 @@ match.
                 │
                GND
 
-Pin 4 (OSC1) ── 220k ── Q2 Base
+Pin 4 (OSC1) ── 100k ── Q2 Base
 
 Day:   Pin 4 = HIGH → Q2 base ≈ VDD → Veb ≈ 0 → OFF → LEDs dark
 Night: Pin 4 oscillates → Q2 toggles → LEDs shimmer

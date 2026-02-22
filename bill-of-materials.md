@@ -27,7 +27,7 @@
 | 1 | 47k | 1/4W 5% | Dusk threshold (parallel pulldown) |
 | 1 | 470k | 1/4W 5% | Fade-in ramp charging resistor |
 | 2 | 1M | 1/4W 5% | Oscillator timing (fixed portion, one per osc) |
-| 2 | 220k | 1/4W 5% | Oscillator output to PNP base drive (Q2, Q3) |
+| 2 | 100k | 1/4W 5% | Oscillator output to PNP base drive (Q2, Q3) |
 | 1 | 10k | 1/4W 5% | Fade node to Q1 base drive |
 | 3 | 1.5k | 1/4W 5% | Steady bank LED current limit (~0.9 mA each) |
 | 6 | 2.2k | 1/4W 5% | Twinkle bank LED current limit (~0.6 mA each) |
@@ -103,10 +103,10 @@ Q1 (NPN, steady):
   Ic_max = hFE x Ib = 100 x 0.29 mA = 29 mA  (plenty for 3 LEDs at 0.93 mA)
 
 Q2/Q3 (PNP, twinkle):
-  Ib = (VDD - Vbe - V_base) / 220k
-  When output LOW:  Ib = (3.6 - 0.7 - 0) / 220k = 13 uA
-  When output HIGH: Ib = (3.6 - 0.7 - 3.6) / 220k < 0  → OFF
-  Ic_max = hFE x Ib = 100 x 13 uA = 1.3 mA  (sufficient for 3 LEDs at 0.64 mA)
+  Ib = (VDD - Vbe - V_base) / 100k
+  When output LOW:  Ib = (3.6 - 0.7 - 0) / 100k = 29 uA
+  When output HIGH: Ib = (3.6 - 0.7 - 3.6) / 100k < 0  → OFF
+  Ic_max = hFE x Ib = 100 x 29 uA = 2.9 mA  (sufficient for 3 LEDs at 0.64 mA = 1.92 mA)
 ```
 
 ### Solar Charge Current

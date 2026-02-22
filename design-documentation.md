@@ -266,7 +266,7 @@ I_LED = (VDD - V_LED - Vce_sat) / R = (3.6 - 2.0 - 0.2) / 1500 = 0.93 mA
                     │
                 Q2 Emitter (PNP)
                     │
-OSC1 ── [220k] ── Q2 Base
+OSC1 ── [100k] ── Q2 Base
                     │
                 Q2 Collector
                     │
@@ -287,6 +287,12 @@ base is at VDD (HIGH), solving this naturally:
 | HIGH (day, stuck) | ≈ VDD | OFF (Veb ≈ 0) | Dark |
 | HIGH (night, osc) | ≈ VDD | OFF | Dark |
 | LOW (night, osc) | ≈ 0V | ON (Veb ≈ VDD) | Lit |
+
+Base drive through 100k ensures reliable saturation for 3 LEDs per bank:
+```
+Ib = (VDD - Vbe) / 100k = (3.6 - 0.7) / 100k = 29 uA
+Ic_max = hFE × Ib = 100 × 29 uA = 2.9 mA (> 1.92 mA needed)
+```
 
 LED current when ON:
 ```
@@ -359,7 +365,7 @@ Red and amber also evoke the warm "crystal mine" aesthetic.
 | Twinkle 1: 3 × 0.64 mA × 50% | 0.96 mA |
 | Twinkle 2: 3 × 0.64 mA × 50% | 0.96 mA |
 | Q1 base drive | 0.29 mA |
-| Q2/Q3 base drive | 0.03 mA |
+| Q2/Q3 base drive | 0.06 mA |
 | **Total active (average)** | **~5.1 mA** |
 | **Total active (peak)** | **~7.0 mA** |
 
