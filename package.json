@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@mermaid-js/parser": "^1.0.0",
-    "mermaid": "^11.12.3"
-  }
-}
