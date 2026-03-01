@@ -232,9 +232,12 @@ Row 63:  wire from Row 50 col D → LED anode, LED cathode → 2.2k → (−) ra
 
 ```mermaid
 graph LR
-    RED["RED<br/>VDD power"] ~~~ BLACK["BLACK<br/>GND ground"]
-    YELLOW["YELLOW<br/>DARK signal<br/>(Pin 3 → Pin 5, Pin 8, 470k)"] ~~~ ORANGE["ORANGE<br/>FADE node<br/>(100uF → 10k → Q1)"]
-    GREEN["GREEN<br/>OSC1 output<br/>(Pin 4 → 100k → Q2)"] ~~~ BLUE["BLUE<br/>OSC2 output<br/>(Pin 10 → 100k → Q3)"]
+    RED["RED<br/>VDD power"]
+    BLACK["BLACK<br/>GND ground"]
+    YELLOW["YELLOW<br/>DARK signal<br/>(Pin 3 → Pin 5, Pin 8, 470k)"]
+    ORANGE["ORANGE<br/>FADE node<br/>(100uF → 10k → Q1)"]
+    GREEN["GREEN<br/>OSC1 output<br/>(Pin 4 → 100k → Q2)"]
+    BLUE["BLUE<br/>OSC2 output<br/>(Pin 10 → 100k → Q3)"]
     WHITE["WHITE<br/>LDR SENSE node<br/>(LDR → Pin 1/2)"]
 
     style RED fill:#cc0000,color:#fff
